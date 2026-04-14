@@ -4,29 +4,25 @@ const Order = require('../models/Order');
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_SECRET
+  key_secret: process.env.RAZORPAY_KEY_SECRET
 });
 
-// POST /api/payment/create-order
 const createRazorpayOrder = async (req, res) => {
   try {
     const { amount, orderId } = req.body;
 
+    console.log('KEY ID:', process.env.RAZORPAY_KEY_ID);
+    console.log('KEY SECRET EXISTS:', !!process.env.RAZORPAY_KEY_SECRET);
+    console.log('REQ BODY:', req.body);
+
     const options = {
-      amount: Math.round(amount * 100), // paise
+      amount: Math.round(Number(amount) * 100),
       currency: 'INR',
-      receipt: `rcpt_${(orderId || Date.now()).toString().slice(-10)}`,
-      notes: { orderId: orderId || '' },
-      // ✅ Explicitly enable UPI and all payment methods
-      payment: {
-        capture: 'automatic',
-        capture_options: {
-          automatic_expiry_period: 12,
-          manual_expiry_period: 7200,
-          refund_speed: 'normal'
-        }
-      }
+      receipt: `rcpt_${String(orderId || Date.now()).slice(-10)}`,
+      notes: { orderId: String(orderId || '') }
     };
+
+    console.log('RAZORPAY OPTIONS:', options);
 
     const razorpayOrder = await razorpay.orders.create(options);
 
@@ -37,27 +33,28 @@ const createRazorpayOrder = async (req, res) => {
       key: process.env.RAZORPAY_KEY_ID
     });
   } catch (err) {
-    console.error('Razorpay error:', err);
-    res.status(500).json({ message: 'Razorpay order creation failed', error: err.message });
+    console.error('RAZORPAY CREATE ORDER ERROR:', err?.error || err);
+    res.status(500).json({
+      message: 'Razorpay order creation failed',
+      error: err?.error?.description || err.message
+    });
   }
 };
 
-// POST /api/payment/verify
 const verifyPayment = async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, orderId } = req.body;
 
-    // HMAC SHA256 signature verification
     const body = razorpay_order_id + '|' + razorpay_payment_id;
     const expectedSignature = crypto
-      .createHmac('sha256', process.env.RAZORPAY_SECRET)
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
       .update(body)
       .digest('hex');
 
-    if (expectedSignature !== razorpay_signature)
+    if (expectedSignature !== razorpay_signature) {
       return res.status(400).json({ success: false, message: 'Invalid payment signature' });
+    }
 
-    // Update order as paid in DB
     if (orderId) {
       const order = await Order.findById(orderId);
       if (order) {
@@ -80,12 +77,10 @@ const verifyPayment = async (req, res) => {
   }
 };
 
-// GET /api/payment/key
 const getRazorpayKey = (req, res) => {
   res.json({ key: process.env.RAZORPAY_KEY_ID });
 };
 
-// GET /api/payment/methods - return enabled methods info
 const getPaymentMethods = (req, res) => {
   res.json({
     methods: ['upi', 'card', 'netbanking', 'wallet', 'emi'],
