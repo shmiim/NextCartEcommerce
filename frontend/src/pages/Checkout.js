@@ -67,7 +67,7 @@ export default function Checkout() {
               upi: {
                 name: 'Pay via UPI',
                 instruments: [
-                  { method: 'upi', flows: ['qr', 'collect', 'intent'] }
+                  { method: 'upi' }
                 ]
               },
               card: {
@@ -103,7 +103,7 @@ export default function Checkout() {
         prefill: {
           name: user.name,
           email: user.email,
-          contact: user.phone || '',
+          contact: user.phone || '9999999999',
           // Pre-fill UPI ID if user typed one
           ...(payMethod === 'upi' && upiId ? { vpa: upiId } : {})
         },
