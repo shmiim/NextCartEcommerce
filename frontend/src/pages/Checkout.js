@@ -123,7 +123,8 @@ export default function Checkout() {
       rzp.open();
 
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Checkout failed');
+      const message = err.response?.data?.error || err.response?.data?.message || 'Checkout failed';
+      toast.error(message);
       setLoading(false);
     }
   };
