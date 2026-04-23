@@ -88,7 +88,19 @@ export default function Checkout() {
         retry: { enabled: true },
         config: {
           display: {
-            language: 'en'
+            language: 'en',
+            sequence: payMethod === 'upi'
+              ? ['upi', 'card', 'netbanking', 'wallet']
+              : payMethod === 'card'
+                ? ['card', 'upi', 'netbanking', 'wallet']
+                : payMethod === 'netbanking'
+                  ? ['netbanking', 'upi', 'card', 'wallet']
+                  : payMethod === 'wallet'
+                    ? ['wallet', 'upi', 'card', 'netbanking']
+                    : ['upi', 'card', 'netbanking', 'wallet'],
+            preferences: {
+              show_default_blocks: false
+            }
           }
         },
 
