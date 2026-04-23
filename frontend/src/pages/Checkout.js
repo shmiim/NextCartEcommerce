@@ -11,7 +11,6 @@ export default function Checkout() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [payMethod, setPayMethod] = useState('all'); // 'all' | 'upi' | 'card' | 'netbanking' | 'wallet'
-  const [upiId, setUpiId] = useState('');
   const [address, setAddress] = useState({
     street: user?.address?.street || '',
     city: user?.address?.city || '',
@@ -30,7 +29,7 @@ export default function Checkout() {
     const { street, city, state, pincode } = address;
     if (!street || !city || !state || !pincode) { toast.error('Please fill all address fields'); return; }
     if (cart.length === 0) { toast.error('Cart is empty'); return; }
-    if (payMethod === 'upi' && !upiId) { toast.error('Please enter your UPI ID'); return; }
+    if (!window.Razorpay) { toast.error('Razorpay checkout failed to load'); return; }
 
     setLoading(true);
     try {
@@ -50,7 +49,13 @@ export default function Checkout() {
         amount: total, orderId: order._id
       });
 
-      // 3. Build Razorpay options with UPI enabled
+      const preferredMethod = payMethod === 'all' ? undefined : payMethod;
+      const customerPhone = user?.phone
+        ? (String(user.phone).startsWith('+') ? String(user.phone) : `+91${String(user.phone)}`)
+        : '+919999999999';
+
+      // Use the standard Checkout configuration so Razorpay can expose the
+      // currently supported test methods without custom block restrictions.
       const options = {
         key: rzpData.key,
         amount: rzpData.amount,
@@ -59,34 +64,6 @@ export default function Checkout() {
         description: `Order #${order._id.slice(-6).toUpperCase()}`,
         image: 'https://img.icons8.com/fluency/48/lightning-bolt.png',
         order_id: rzpData.razorpay_order_id,
-
-        // ✅ Enable all payment methods including UPI
-        config: {
-          display: {
-            blocks: {
-              upi: {
-                name: 'Pay via UPI',
-                instruments: [
-                  { method: 'upi' }
-                ]
-              },
-              card: {
-                name: 'Cards',
-                instruments: [{ method: 'card' }]
-              },
-              netbanking: {
-                name: 'Net Banking',
-                instruments: [{ method: 'netbanking' }]
-              },
-              wallet: {
-                name: 'Wallets',
-                instruments: [{ method: 'wallet' }]
-              }
-            },
-            sequence: ['block.upi', 'block.card', 'block.netbanking', 'block.wallet'],
-            preferences: { show_default_blocks: false }
-          }
-        },
 
         handler: async (response) => {
           try {
@@ -103,13 +80,17 @@ export default function Checkout() {
         prefill: {
           name: user.name,
           email: user.email,
-          contact: user.phone || '9999999999',
-          // Pre-fill UPI ID if user typed one
-          ...(payMethod === 'upi' && upiId ? { vpa: upiId } : {})
+          contact: customerPhone,
         },
 
         notes: { orderId: order._id },
-        theme: { color: '#6366f1', hide_topbar: false },
+        theme: { color: '#6366f1' },
+        retry: { enabled: true },
+        config: {
+          display: {
+            language: 'en'
+          }
+        },
 
         modal: {
           ondismiss: () => {
@@ -118,13 +99,9 @@ export default function Checkout() {
           },
           confirm_close: true,
           escape: false
-        }
+        },
+        ...(preferredMethod ? { method: preferredMethod } : {})
       };
-
-      // If user chose UPI only, open directly on UPI
-      if (payMethod === 'upi') {
-        options.method = 'upi';
-      }
 
       const rzp = new window.Razorpay(options);
       rzp.on('payment.failed', (resp) => {
@@ -207,30 +184,18 @@ export default function Checkout() {
                 ))}
               </div>
 
-              {/* UPI ID input when UPI selected */}
+              {/* UPI guidance when UPI selected */}
               {payMethod === 'upi' && (
                 <div style={{ background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 12, padding: 16 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                     <span style={{ fontSize: 20 }}>📱</span>
-                    <span style={{ fontWeight: 700, fontSize: 15 }}>Enter UPI ID</span>
-                  </div>
-                  <input
-                    className="form-input"
-                    placeholder="yourname@upi  (e.g. success@razorpay for test)"
-                    value={upiId}
-                    onChange={e => setUpiId(e.target.value)}
-                    style={{ marginBottom: 10 }}
-                  />
-                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                    {['@okaxis', '@oksbi', '@okicici', '@ybl', '@paytm', '@upi'].map(suffix => (
-                      <button key={suffix} onClick={() => setUpiId(prev => prev.split('@')[0] + suffix)}
-                        style={{ padding: '4px 10px', borderRadius: 6, background: '#1e1e2e', border: '1px solid rgba(255,255,255,0.1)', fontSize: 11, color: '#818cf8', cursor: 'pointer' }}>
-                        {suffix}
-                      </button>
-                    ))}
+                    <span style={{ fontWeight: 700, fontSize: 15 }}>UPI Test Mode</span>
                   </div>
                   <p style={{ fontSize: 11, color: '#6b6b82', marginTop: 10 }}>
-                    🧪 Test UPI ID: <code style={{ color: '#818cf8' }}>success@razorpay</code>
+                    Razorpay opens its standard UPI sheet directly. On desktop, use the QR flow; on mobile, use a supported UPI app from the popup.
+                  </p>
+                  <p style={{ fontSize: 11, color: '#fbbf24', marginTop: 8 }}>
+                    Manual UPI ID collect is deprecated by Razorpay from February 28, 2026, so this checkout no longer forces a typed UPI ID.
                   </p>
                 </div>
               )}
@@ -312,7 +277,7 @@ export default function Checkout() {
                 ))}
               </div>
               <div style={{ marginTop: 14, padding: '10px 12px', background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)', borderRadius: 8 }}>
-                <p style={{ fontSize: 11, color: '#fbbf24' }}>🧪 <strong>Test Mode:</strong> Use UPI <code>success@razorpay</code> or card <code>4111 1111 1111 1111</code></p>
+                <p style={{ fontSize: 11, color: '#fbbf24' }}>🧪 <strong>Test Mode:</strong> For cards use <code>4111 1111 1111 1111</code>, any future expiry, any 3-digit CVV, and OTP <code>1234</code>.</p>
               </div>
             </div>
           </div>

@@ -85,8 +85,13 @@ const getPaymentMethods = (req, res) => {
   res.json({
     methods: ['upi', 'card', 'netbanking', 'wallet', 'emi'],
     upi_apps: ['gpay', 'phonepe', 'paytm', 'bhim'],
-    test_upi: 'success@razorpay',
-    test_card: '4111 1111 1111 1111'
+    test_upi: 'Use Razorpay test-mode UPI flow from the checkout popup or QR',
+    test_card: '4111 1111 1111 1111',
+    test_card_meta: {
+      expiry: 'Any future date',
+      cvv: 'Any 3 digits',
+      otp: '1234'
+    }
   });
 };
 
