@@ -25,25 +25,29 @@ export default function Home() {
     <div className="home">
       {/* Hero */}
       <section className="hero">
-        <div className="hero-bg" />
-        <div className="container hero-content">
-          <div className="hero-badge badge badge-primary">🎉 New Arrivals Every Week</div>
-          <h1 className="hero-title">
-            Shop the <span className="gradient-text">Future</span><br />
-            with <span className="gradient-text">NexCart</span>
-          </h1>
-          <p className="hero-sub">Discover millions of products at unbeatable prices. Fast delivery, secure payments, and hassle-free returns.</p>
-          <div className="hero-actions">
-            <Link to="/products" className="btn btn-primary btn-lg">🛍️ Shop Now</Link>
-            <Link to="/products?featured=true" className="btn btn-outline btn-lg">✨ View Deals</Link>
-          </div>
-          <div className="hero-stats">
-            {[['10K+', 'Products'], ['50K+', 'Customers'], ['99%', 'Satisfaction'], ['24/7', 'Support']].map(([num, label]) => (
-              <div key={label} className="stat-item">
-                <span className="stat-num">{num}</span>
-                <span className="stat-label">{label}</span>
+        <div className="container">
+          <div className="hero-content">
+            <h1 className="hero-title">
+              Shop Smarter with NexCart
+            </h1>
+            <p className="hero-sub">
+              Discover premium products, smooth checkout, and a modern shopping experience built for speed.
+            </p>
+            <div className="hero-actions">
+              <Link to="/products" className="btn btn-primary btn-lg">Shop Now</Link>
+              <Link to="/products?featured=true" className="btn btn-outline btn-lg">View Collections</Link>
+            </div>
+            <div className="hero-features">
+              <div className="hero-feature">
+                <span className="feature-icon-small">🚚</span> Fast Delivery
               </div>
-            ))}
+              <div className="hero-feature">
+                <span className="feature-icon-small">🔒</span> Secure Payment
+              </div>
+              <div className="hero-feature">
+                <span className="feature-icon-small">↩️</span> Easy Returns
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -67,7 +71,7 @@ export default function Home() {
       </section>
 
       {/* Featured Products */}
-      <section className="section" style={{ background: '#0d0d14' }}>
+      <section className="section">
         <div className="container">
           <div className="section-header">
             <h2 className="section-title">Featured <span className="gradient-text">Products</span></h2>
@@ -82,7 +86,7 @@ export default function Home() {
           ) : (
             <div className="empty-state">
               <div style={{ fontSize: 48, marginBottom: 12 }}>🛍️</div>
-              <p style={{ color: '#6b6b82' }}>No featured products yet. Add some from the backend!</p>
+              <p style={{ color: 'var(--text2)' }}>No featured products yet. Add some from the backend!</p>
               <Link to="/products" className="btn btn-primary" style={{ marginTop: 16 }}>Browse All Products</Link>
             </div>
           )}
