@@ -1,0 +1,106 @@
+.products-page {
+  background: #f8fafc;
+}
+
+.products-header {
+  margin-bottom: 28px;
+}
+
+.products-title {
+  color: #111827;
+}
+
+.products-subtitle {
+  color: #6b7280;
+}
+
+.products-controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  padding: 14px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.products-search {
+  display: flex;
+  flex: 1;
+  min-width: 240px;
+}
+
+.products-search-input {
+  flex: 1;
+  border-radius: 12px 0 0 12px;
+}
+
+.products-search-btn {
+  border-radius: 0 12px 12px 0;
+}
+
+.products-page .form-input {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.10);
+  color: #111827;
+}
+
+.products-page .form-input::placeholder {
+  color: #6b7280;
+}
+
+.products-page .form-input:focus {
+  border-color: rgba(17, 24, 39, 0.35);
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
+}
+
+.products-page select.form-input {
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
+}
+
+.products-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.category-pill {
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.10);
+  background: rgba(255, 255, 255, 0.9);
+  color: #4b5563;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
+}
+
+.category-pill:hover {
+  transform: translateY(-1px);
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.16);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.06);
+  color: #111827;
+}
+
+.category-pill.active {
+  background: rgba(17, 24, 39, 0.06);
+  border-color: rgba(17, 24, 39, 0.14);
+  color: #111827;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.06);
+  transform: none;
+}
+
+.products-empty-sub {
+  color: #6b7280;
+}
+
+@media (max-width: 768px) {
+  .products-controls { padding: 12px; }
+}
+

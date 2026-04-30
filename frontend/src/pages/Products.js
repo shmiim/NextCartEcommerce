@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import API from '../utils/api';
 import ProductCard from '../components/common/ProductCard';
+import './Products.css';
 
 export default function Products() {
   const [products, setProducts] = useState([]);
@@ -44,19 +45,19 @@ export default function Products() {
   };
 
   return (
-    <div className="page-wrapper">
+    <div className="page-wrapper products-page">
       <div className="container">
-        <div style={{ marginBottom: 28 }}>
-          <h1 className="page-title">All Products</h1>
-          <p className="page-sub">{total} products found</p>
+        <div className="products-header">
+          <h1 className="page-title products-title">All Products</h1>
+          <p className="page-sub products-subtitle">{total} products found</p>
         </div>
 
         {/* Search + Filters */}
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 32 }}>
-          <form onSubmit={e => { e.preventDefault(); setParam('keyword', search); }} style={{ display: 'flex', flex: 1, minWidth: 240 }}>
-            <input className="form-input" style={{ flex: 1, borderRadius: '12px 0 0 12px' }}
+        <div className="products-controls">
+          <form className="products-search" onSubmit={e => { e.preventDefault(); setParam('keyword', search); }}>
+            <input className="form-input products-search-input"
               placeholder="Search products..." value={search} onChange={e => setSearch(e.target.value)} />
-            <button type="submit" className="btn btn-primary" style={{ borderRadius: '0 12px 12px 0' }}>🔍</button>
+            <button type="submit" className="btn btn-primary products-search-btn">Search</button>
           </form>
           <select className="form-input" style={{ minWidth: 160 }} value={category} onChange={e => setParam('category', e.target.value)}>
             <option value="all">All Categories</option>
@@ -71,16 +72,10 @@ export default function Products() {
         </div>
 
         {/* Category pills */}
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 28 }}>
+        <div className="products-pills">
           {['all', ...categories].map(c => (
             <button key={c} onClick={() => setParam('category', c)}
-              style={{
-                padding: '6px 16px', borderRadius: 100, border: '1px solid',
-                borderColor: category === c ? '#6366f1' : 'rgba(255,255,255,0.08)',
-                background: category === c ? 'rgba(99,102,241,0.15)' : 'transparent',
-                color: category === c ? '#818cf8' : '#6b6b82',
-                fontSize: 13, fontWeight: 500, cursor: 'pointer', transition: 'all 0.2s'
-              }}>
+              className={`category-pill ${category === c ? 'active' : ''}`}>
               {c === 'all' ? 'All' : c}
             </button>
           ))}
@@ -105,7 +100,7 @@ export default function Products() {
           <div style={{ textAlign: 'center', padding: '80px 20px' }}>
             <div style={{ fontSize: 60, marginBottom: 16 }}>🔍</div>
             <h3 style={{ marginBottom: 8 }}>No products found</h3>
-            <p style={{ color: '#6b6b82' }}>Try adjusting your filters</p>
+            <p className="products-empty-sub">Try adjusting your filters</p>
           </div>
         )}
       </div>

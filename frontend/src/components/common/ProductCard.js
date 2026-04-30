@@ -32,7 +32,7 @@ export default function ProductCard({ product }) {
         <div className="product-rating">
           <div className="stars">
             {[1,2,3,4,5].map(s => (
-              <span key={s} className="star" style={{ color: s <= Math.round(product.rating) ? '#f59e0b' : '#2a2a3a' }}>★</span>
+              <span key={s} className="star" style={{ color: s <= Math.round(product.rating) ? '#f59e0b' : '#d1d5db' }}>★</span>
             ))}
           </div>
           <span className="rating-count">({product.numReviews})</span>

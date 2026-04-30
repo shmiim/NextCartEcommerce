@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import API from '../utils/api';
 import { useCart } from '../context/CartContext';
 import toast from 'react-hot-toast';
+import './ProductDetail.css';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -91,11 +92,14 @@ export default function ProductDetail() {
               <button className="btn btn-primary btn-lg" onClick={handleBuyNow} disabled={product.stock === 0}>⚡ Buy Now</button>
             </div>
 
-            <div style={{ marginTop: 28, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div className="product-detail-features">
               {[['🚚', 'Free Delivery', 'Above ₹499'], ['↩️', 'Easy Return', '7 day policy'], ['🔒', 'Secure Pay', 'Razorpay'], ['✅', 'Genuine', '100% authentic']].map(([icon, t, s]) => (
-                <div key={t} style={{ background: '#1e1e2e', borderRadius: 10, padding: '12px 14px', display: 'flex', gap: 10, alignItems: 'center', border: '1px solid rgba(255,255,255,0.06)' }}>
-                  <span style={{ fontSize: 20 }}>{icon}</span>
-                  <div><div style={{ fontSize: 13, fontWeight: 600 }}>{t}</div><div style={{ fontSize: 11, color: '#6b6b82' }}>{s}</div></div>
+                <div key={t} className="feature-card">
+                  <div className="feature-icon">{icon}</div>
+                  <div>
+                    <div className="feature-title">{t}</div>
+                    <div className="feature-subtitle">{s}</div>
+                  </div>
                 </div>
               ))}
             </div>
